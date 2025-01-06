@@ -114,13 +114,13 @@ like this in your .xinitrc:
 - requirnment: xinit installed (maybe not installed on wayland systems)
 - Place a dwm.desktop file will be placed in `/usr/share/xsessions/`.
 ```
-    [Desktop Entry]
-    Encoding=UTF-8
-    Name=dwm
-    Comment=Dynamic window manager
-    Exec=dwm
-    Icon=dwm
-    Type=XSession
+[Desktop Entry]
+Encoding=UTF-8
+Name=dwm
+Comment=Dynamic window manager
+Exec=dwm
+Icon=dwm
+Type=XSession
 ```
 Add `exec dwm` at the end of your `~/.xinitrc` file.
 
