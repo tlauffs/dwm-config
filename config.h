@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <X11/XF86keysym.h>
 
 /* appearance */
 static const unsigned int borderpx = 1; /* border pixel of windows */
@@ -19,8 +20,8 @@ static const unsigned int systraypinning = 0;
 static const int systraypinningfailfirst = 1;
 
 static const int topbar = 1; /* 0 means bottom bar */
-static const char *fonts[] = {"monospace:size=12"};
-static const char dmenufont[] = "monospace:size=12";
+static const char *fonts[] = {"JetBrainsMono Nerd Font:size=12"};
+static const char dmenufont[] = "JetBrainsMono Nerd Font:size=12";
 static const char col_gray1[] = "#222222";
 static const char col_gray2[] = "#444444";
 static const char col_gray3[] = "#bbbbbb";
@@ -37,9 +38,12 @@ static const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
 // autostart
 static const char *const autostart[] = {
-    "flameshot", NULL, "dunst", NULL,
-    "nm-applet", NULL, "picom", "-b",
-    NULL,        "sh", "-c",    "feh --randomize --bg-fill ~/wallpapers/*",
+    "flameshot", NULL,
+    "dunst",     NULL,
+    "nm-applet", NULL,
+    "picom",     "-b",
+    NULL,        "sh",
+    "-c",        "feh --randomize --bg-fill ~/wallpapers/rose-pine/*",
     NULL,        NULL /* terminate */
 };
 
@@ -54,8 +58,8 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact = 0.55; /* factor of master area size [0.05..0.95] */
-static const int nmaster = 1;    /* number of clients in master area */
+static const float mfact = 0.6; /* factor of master area size [0.05..0.95] */
+static const int nmaster = 1;   /* number of clients in master area */
 static const int resizehints =
     1; /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen =
@@ -108,24 +112,72 @@ static const Key keys[] = {
     // quit
     {MODKEY | ShiftMask, XK_q, quit, {0}},
 
-    {MODKEY, XK_i, incnmaster, {.i = +1}},
-    {MODKEY, XK_d, incnmaster, {.i = -1}},
+    // change number of master windows
+    {MODKEY | ShiftMask, XK_i, incnmaster, {.i = +1}},
+    {MODKEY | ShiftMask, XK_d, incnmaster, {.i = -1}},
+
+    // chagne size of master stack
     {MODKEY, XK_h, setmfact, {.f = -0.05}},
     {MODKEY, XK_l, setmfact, {.f = +0.05}},
-    {MODKEY, XK_Return, zoom, {0}},
 
+    // swap master with current window
+    {MODKEY, XK_space, zoom, {0}},
+
+    // switch to previous tab
     {MODKEY | ShiftMask, XK_Tab, view, {0}},
+
+    // hold mod and use mouse to move windows
+    // master layout
     {MODKEY, XK_t, setlayout, {.v = &layouts[0]}},
+    // floatung layout
     {MODKEY, XK_f, setlayout, {.v = &layouts[1]}},
+    // tab/window layout
     {MODKEY, XK_m, setlayout, {.v = &layouts[2]}},
-    {MODKEY, XK_space, setlayout, {0}},
+    // toggle window floating state
     {MODKEY | ShiftMask, XK_space, togglefloating, {0}},
+
+    // change layout
+    // {MODKEY, XK_space, setlayout, {0}},
+
+    // show all open windows
     {MODKEY, XK_0, view, {.ui = ~0}},
+    // reassign to single window
     {MODKEY | ShiftMask, XK_0, tag, {.ui = ~0}},
+
+    // change monitor focus
     {MODKEY, XK_comma, focusmon, {.i = -1}},
     {MODKEY, XK_period, focusmon, {.i = +1}},
+
+    // move window to diffrent monitor
     {MODKEY | ShiftMask, XK_comma, tagmon, {.i = -1}},
     {MODKEY | ShiftMask, XK_period, tagmon, {.i = +1}},
+
+    // brightness and audio
+    {0, XF86XK_MonBrightnessUp, spawn,
+     SHCMD("sh -c /usr/bin/brightnessctl set 10%-; notify-send -t 200 -u low 'Brightness' $(brightnesctl get) "
+           "'%')")},
+    {0, XF86XK_MonBrightnessDown, spawn,
+     SHCMD("sh -c /usr/bin/brightnessctl set 10%-; notify-send -t 200 -u low 'Brightness' $(brightnessctl get) "
+           "'%')")},
+    {0, XF86XK_AudioLowerVolume, spawn,
+     SHCMD("amixer sset Master 5%- unmute; notify-send -t 200 -u low 'Volume' $(amixer get "
+           "Master | grep -oP '\\[([0-9]+%)\\]' | head -n 1)")},
+    {0, XF86XK_AudioMute, spawn,
+     SHCMD("amixer sset Master $(amixer get Master | grep -q '\\[on\\]' && "
+           "echo 'mute' || echo 'unmute'); notify-send -t 200 -u low 'Audio' $(amixer get "
+           "Master | grep -oP '\\[([a-zA-Z]+)\\]' | head -n 1)")},
+    {0, XF86XK_AudioRaiseVolume, spawn,
+     SHCMD("amixer sset Master 5%+ unmute; notify-send -t 200 -u low 'Volume' $(amixer get "
+           "Master | grep -oP '\\[([0-9]+%)\\]' | head -n 1)")},
+    // wallpaper
+    {MODKEY | ShiftMask, XK_w, spawn,
+     SHCMD("feh --randomize --bg-fill ~/wallpapers/rose-pine/*")},
+
+    // MODKEY + Number: Switch to the corresponding tag.
+    // MODKEY + Control + Number: Toggle the tag visibility.
+    // MODKEY + Shift + Number: Move the currently focused window to the tag.
+    // MODKEY + Control + Shift + Number: Add/remove the focused window to/from
+    // the tag without removing it from other tags.
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
             TAGKEYS(XK_9, 8)};
@@ -144,6 +196,4 @@ static const Button buttons[] = {
     {ClkClientWin, MODKEY, Button3, resizemouse, {0}},
     {ClkTagBar, 0, Button1, view, {0}},
     {ClkTagBar, 0, Button3, toggleview, {0}},
-    {ClkTagBar, MODKEY, Button1, tag, {0}},
-    {ClkTagBar, MODKEY, Button3, toggletag, {0}},
 };
