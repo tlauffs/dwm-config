@@ -133,3 +133,9 @@ run startx
 -------------
 The configuration of dwm is done by creating a custom config.h
 and (re)compiling the source code.
+
+## TODO
+- fix brighnessctl not working from dwm config
+- fix maually need to change refresh rate: ❯ xrandr --output DisplayPort-1 --mode 2560x1440 --rate 120
+- add patches
+
